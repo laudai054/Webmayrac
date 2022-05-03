@@ -1,0 +1,97 @@
+﻿
+@model SV18T1021246.Web.Models.SupplierPaginationResultModel
+@{
+    ViewBag.Title = "Nhà cung cấp";
+}
+
+<!--Dể đổi 1 class nhấn ctrl + R + R-->
+<!-- Default box -->
+<div class="box" style="">
+    <form action="~/supplier" method="get">
+        <div class="input-group">
+            <input type="text" name="searchValue" 
+                   class="form-control"
+                   placeholder="Nhập tên hoặc địa chỉ nhà cung cấp cần tìm.." autofocus value="@Model.SearchValue">
+            <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat btn-info">
+                    <i class="fa fa-search"></i>
+                </button>
+                <a href="~/supplier/create" class="btn btn-flat btn-primary" style="margin-left:10px">
+                    <i class="fa fa-plus"></i>Bổ sung
+                </a>
+            </span>
+        </div>
+    </form>
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+    </div>
+    <div class="row" style="margin: 1px 0 10px 0;">
+        <div class="col-sm-12">
+            Có <strong>@Model.RowCount</strong> khách hàng trong tổng số <strong>@Model.PageCount</strong> trang
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th>Tên nhà cung cấp</th>
+                        <th>Tên giao dịch</th>
+                        <th>Địa chỉ</th>
+                        <th>Quốc gia</th>
+                        <th>thành phố</th>
+                        <th>Mã bưu chính</th>
+                        <th>số điện thoại</th>
+                        <th style="width:75px">&nbsp;
+                        <th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td>@item.SupplierName</td>
+                            <td>@item.ContactName</td>
+                            <td>@item.Address</td>
+                            <td>@item.Country</td>
+                            <td>@item.City</td>
+                            <td>@item.PostalCode</td>
+                            <td>@item.Phone </td>
+                            <td class="text-right">
+                                <a href="~/supplier/edit/@item.SupplierID" class="btn btn-xs btn btn-flat btn-info">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a href="~/supplier/delete/@item.SupplierID" class="btn btn-xs btn btn-flat btn-danger">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="container-fluid">
+            <div class="text-center">
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.Page)
+                        {
+                            <li class="active"><a href="#">@i</a></li> 
+                        }
+                        else
+                        {
+                            <li><a href="~/supplier?page=@i&seachValue=@Model.SearchValue">@i</a></li>
+                        }
+                     }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-footer-->
+</div>
+<!-- /.box -->

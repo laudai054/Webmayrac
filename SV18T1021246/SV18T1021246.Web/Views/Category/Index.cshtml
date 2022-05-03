@@ -1,0 +1,83 @@
+﻿
+@model SV18T1021246.Web.Models.CategoryPaginationResultModel
+@{
+    ViewBag.Title = "Loại hàng";
+}
+<!-- Default box -->
+<div class="box" style="">
+    <form action="~/category" method="get">
+        <div class="input-group">
+            <input type="text" name="searchValue"
+                   class="form-control"
+                   placeholder="Nhập tên hoặc thông tin mặt hàng... " autofocus value="@Model.SearchValue">
+            <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat btn-info">
+                    <i class="fa fa-search"></i>
+                </button>
+                <a href="~/category/create" class="btn btn-flat btn-primary" style="margin-left:10px">
+                    <i class="fa fa-plus"></i>Bổ sung
+                </a>
+            </span>
+        </div>
+    </form>
+    <div class="box-header with-border">
+        <h3 class="box-title"></h3>
+    </div>
+    <div class="row" style="margin: 1px 0 10px 0;">
+        <div class="col-sm-12">
+            Có <strong>@Model.RowCount</strong> sản phẩm tổng số <strong>@Model.PageCount</strong> trang
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th>Tên loại hàng:</th>
+                        <th>Mô tả</th>
+                        <th style="width:75px">&nbsp;
+                        <th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td>@item.CategoryName</td>
+                            <td>@item.Description</td>
+                            <td class="text-right">
+                                <a href="~/category/edit/@item.CategoryID" class="btn btn-xs btn btn-flat btn-info">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a href="~/category/delete/@item.CategoryID" class="btn btn-xs btn btn-flat btn-danger">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="container-fluid">
+            <div class="text-center">
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.Page)
+                        {
+                            <li class="active"><a href="#">@i</a></li>
+                         }
+                         else
+                         {
+                              <li><a href="~/category?page=@i&seachValue=@Model.SearchValue">@i</a></li>}
+                         }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-footer-->
+</div>
+<!-- /.box -->
