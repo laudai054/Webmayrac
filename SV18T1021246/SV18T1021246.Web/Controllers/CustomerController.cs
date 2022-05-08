@@ -1,5 +1,6 @@
 ﻿using SV18T1021246.BusinessLayer;
 using SV18T1021246.DomainModel;
+using SV18T1021246.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,30 +14,27 @@ namespace SV18T1021246.Web.Controllers
     public class CustomerController : Controller
     {
         /// <summary>
-        /// Tìm kiếm hiển thị danh sách khách hàng
+        /// Giao diện tìm kiếm
         /// </summary>
         /// <returns></returns>
         // GET: Customer
-        public ActionResult Index(int page = 1, string searchValue = "")
+        public ActionResult Index()
         {
-            int pageSize = 10;
-            int rowCount = 0;
-            var data = CommonDataService.ListOfCustomers(page,
-                                                       pageSize,
-                                                       searchValue,
-                                                       out rowCount);
-
-            Models.CustomerPaginationResultModel model = new Models.CustomerPaginationResultModel()
+            //Trong session luôn lưu điều kiện tìm kiếm vừa thực hiện
+            PaginationSearchInput model = Session["CUSTOMER_SEARCH"] as PaginationSearchInput;
+            if(model == null)
             {
-                Page = page,
-                PageSize = pageSize,
-                SearchValue = searchValue,
-                RowCount = rowCount,
-                Data = data
-            };
+                model = new PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = 10,
+                    SearchValue = ""
+                };
+            }
             return View(model);
+        }
 
-            /*
+        /*
             var model = CommonDataService.ListOfCustomers(page,
                                                        pageSize,
                                                        searchValue,
@@ -52,7 +50,35 @@ namespace SV18T1021246.Web.Controllers
             ViewBag.SearchValue = searchValue;
             return View(model);
             */
+
+
+        /// <summary>
+        /// Tìm kiếm phân trang
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public ActionResult Search(Models.PaginationSearchInput input)
+        {
+            int rowCount = 0;
+            var data = CommonDataService.ListOfCustomers(input.Page,
+                                                       input.PageSize,
+                                                       input.SearchValue,
+                                                       out rowCount);
+
+            Models.CustomerPaginationResultModel model = new Models.CustomerPaginationResultModel()
+            {
+                Page = input.Page,
+                PageSize = input.PageSize,
+                SearchValue = input.SearchValue,
+                RowCount = rowCount,
+                Data = data
+            };
+
+            Session["CUSTOMER_SEARCH"] = input;
+
+            return View(model);
         }
+
         /// <summary>
         /// Bổ sung kahsch hàng mới
         /// </summary>
@@ -131,6 +157,12 @@ namespace SV18T1021246.Web.Controllers
             else
             {
                 CommonDataService.AddCustomer(model);
+                Session["CUSTOMER_SEARCH"] = new Models.PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = 10,
+                    SearchValue = model.CustomerName
+                };
             }
             return RedirectToAction("Index");
 

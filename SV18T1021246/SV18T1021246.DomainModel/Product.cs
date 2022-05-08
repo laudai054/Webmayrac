@@ -37,5 +37,7 @@ namespace SV18T1021246.DomainModel
         /// </summary>
         public string Photo { get; set; }
 
+        public List<Category> categories { get; set; }
+        public List<Supplier> suppliers { get; set; }
     }
 }

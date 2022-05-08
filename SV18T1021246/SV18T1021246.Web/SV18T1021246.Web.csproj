@@ -137,6 +137,7 @@
     <Compile Include="Models\CustomerPaginationResultModel.cs" />
     <Compile Include="Models\EmployeePaginationResultModel.cs" />
     <Compile Include="Models\PaginationResultModel.cs" />
+    <Compile Include="Models\PaginationSearchInput.cs" />
     <Compile Include="Models\ProductPaginationResultModel.cs" />
     <Compile Include="Models\ShipperPaginationResultModel.cs" />
     <Compile Include="Models\SupplierPaginationResultModel.cs" />
@@ -164,6 +165,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\Search.js" />
     <Content Include="Themes\bower_components\bootstrap-colorpicker\dist\css\bootstrap-colorpicker.css" />
     <Content Include="Themes\bower_components\bootstrap-colorpicker\dist\css\bootstrap-colorpicker.min.css" />
     <Content Include="Themes\bower_components\bootstrap-colorpicker\dist\img\bootstrap-colorpicker\alpha-horizontal.png" />
@@ -5815,10 +5817,13 @@
     <Content Include="Views\Product\Edit.cshtml" />
     <Content Include="Views\Product\Index.cshtml" />
     <Content Include="Views\Product\Photo.cshtml" />
+    <Content Include="Views\Customer\Search.cshtml" />
+    <Content Include="Views\Supplier\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Employees\" />
+    <Folder Include="Images\Products\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

@@ -16,7 +16,31 @@ namespace SV18T1021246.DataLayer.SQLServer
 
         public int Add(Product data)
         {
-            throw new NotImplementedException();
+            int result = 0;
+
+            using (SqlConnection cn = OpenConnection())
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = @"INSERT INTO Products(ProductName, Unit, Price, Photo, CategoryID, SupplierID)
+                                    VALUES(@productName, @unit, @price, @photo, @categoryID, @supplierID)
+                                    SELECT SCOPE_IDENTITY(); ";
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = cn;
+
+                cmd.Parameters.AddWithValue("@productName", data.ProductName);
+                cmd.Parameters.AddWithValue("@unit", data.Unit);
+                cmd.Parameters.AddWithValue("@price", data.Price);
+                cmd.Parameters.AddWithValue("@photo", data.Photo);
+                cmd.Parameters.AddWithValue("categoryID", data.CategoryID);
+                cmd.Parameters.AddWithValue("supplierID", data.SupplierID);
+
+
+                result = Convert.ToInt32(cmd.ExecuteScalar());
+
+                cn.Close();
+            }
+
+            return result;
         }
 
         public int Count(string searchValue)
@@ -51,7 +75,23 @@ namespace SV18T1021246.DataLayer.SQLServer
 
         public bool Delete(int productID)
         {
-            throw new NotImplementedException();
+            bool result = false;
+
+            using (SqlConnection cn = OpenConnection())
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = @"DELETE FROM Products WHERE ProductID = @productID";
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = cn;
+
+                cmd.Parameters.AddWithValue("@productID", productID);
+
+                result = cmd.ExecuteNonQuery() > 0;
+
+                cn.Close();
+            }
+
+            return result;
         }
 
         public Product Get(int productID)
@@ -91,9 +131,66 @@ namespace SV18T1021246.DataLayer.SQLServer
 
         public bool InUsed(int productID)
         {
-            throw new NotImplementedException();
+            bool result = false;
+
+            using (SqlConnection cn = OpenConnection())
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = @"SELECT CASE 
+                                    WHEN EXISTS(
+                                                 SELECT * FROM ProductAttributes WHERE ProductID = @productID
+                                                ) THEN 1 ELSE 0 END";
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = cn;
+
+                cmd.Parameters.AddWithValue("@productID", productID);
+
+                result = Convert.ToBoolean(cmd.ExecuteScalar());
+
+                cn.Close();
+            }
+
+            return result;
         }
         /*
+         * 
+         * @"select *
+                                    from
+                                        (
+                                            select    *,
+                                                    row_number() over(order by ProductName) as RowNumber
+                                            from    Products as p
+                                            where   
+                                            (
+                                                    ((@categoryID = 0) or (p.CategoryID = @categoryID)) and
+                                                    ((@supplierID = 0) or (p.SupplierID = @supplierID)) and
+                                                    ((@searchValue = '') or (p.ProductName like @searchValue))
+                                            ) as t
+                                    where   (@pageSize = 0) or (t.RowNumber between (@page - 1) * @pageSize + 1 and @page * @pageSize)
+                                    order by t.RowNumber";
+         * 
+         * 
+         * 
+         * 
+         * 
+         * @"select *
+                                    from
+                                        (
+                                            select    *,
+                                                    row_number() over(order by ShipperName) as RowNumber
+                                            from    Shippers
+                                            where    (@searchValue = N'')
+                                                or (
+                                                        (ShipperName like @searchValue)
+                                                        or
+                                                        (Phone like @searchValue)
+                                                    )
+                                        ) as t
+                                    where    t.RowNumber between (@page - 1) * @pageSize + 1 and @page * @pageSize
+                                    order by t.RowNumber";
+         * 
+         * 
+         * 
          * declare @page int = 1;
          *          @pageSize int = 5;
          *          @categoryID int = 0;
@@ -112,9 +209,13 @@ namespace SV18T1021246.DataLayer.SQLServer
 
             if (searchValue != "")
                 searchValue = "%" + searchValue + "%";
-            using(SqlConnection cn = OpenConnection())
+
+
+            using (SqlConnection cn = OpenConnection())
             {
                 SqlCommand cmd = new SqlCommand();
+                Console.Write(categoryID + "id;" + supplierID);
+
                 cmd.CommandText = @"select *
                                     from
                                         (
@@ -126,12 +227,16 @@ namespace SV18T1021246.DataLayer.SQLServer
                                                     ((@categoryID = 0) or (p.CategoryID = @categoryID)) and
                                                     ((@supplierID = 0) or (p.SupplierID = @supplierID)) and
                                                     ((@searchValue = '') or (p.ProductName like @searchValue))
-                                            ) as t
+                                            )
+                                        )
+                                            as t
                                     where   (@pageSize = 0) or (t.RowNumber between (@page - 1) * @pageSize + 1 and @page * @pageSize)
                                     order by t.RowNumber";
                 cmd.CommandType = System.Data.CommandType.Text;
                 cmd.Connection = cn;
 
+                cmd.Parameters.AddWithValue("@categoryID", categoryID);
+                cmd.Parameters.AddWithValue("@supplierID", supplierID);
                 cmd.Parameters.AddWithValue("@page", page);
                 cmd.Parameters.AddWithValue("@pageSize", pageSize);
                 cmd.Parameters.AddWithValue("@searchValue", searchValue);
@@ -143,8 +248,6 @@ namespace SV18T1021246.DataLayer.SQLServer
                     {
                         ProductID = Convert.ToInt32(dbReader["ProductID"]),
                         ProductName = Convert.ToString(dbReader["ProductName"]),
-                        SupplierID = Convert.ToInt32(dbReader["SupplierID"]),
-                        CategoryID = Convert.ToInt32(dbReader["CategoryID"]),
                         Unit = Convert.ToString(dbReader["Unit"]),
                         Price = Convert.ToDecimal(dbReader["Price"]),
                         Photo = Convert.ToString(dbReader["Photo"])
@@ -161,7 +264,32 @@ namespace SV18T1021246.DataLayer.SQLServer
 
         public bool Update(Product data)
         {
-            throw new NotImplementedException();
+            bool result = false;
+
+            using (SqlConnection cn = OpenConnection())
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = @"UPDATE Products 
+                                        SET ProductName = @productName,
+                                        Unit = @unit,
+                                        Price = @price,
+                                        Photo = @photo
+                                    WHERE ProductID = @productID";
+                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.Connection = cn;
+
+                cmd.Parameters.AddWithValue("@productName", data.ProductName);
+                cmd.Parameters.AddWithValue("@unit", data.Unit);
+                cmd.Parameters.AddWithValue("@price", data.Price);
+                cmd.Parameters.AddWithValue("@photo", data.Photo);
+                cmd.Parameters.AddWithValue("@productID", data.ProductID);
+
+                result = cmd.ExecuteNonQuery() > 0;
+
+                cn.Close();
+            }
+
+            return result;
         }
     }
 }

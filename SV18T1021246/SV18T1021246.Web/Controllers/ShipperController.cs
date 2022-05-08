@@ -1,5 +1,6 @@
 ﻿using SV18T1021246.BusinessLayer;
 using SV18T1021246.DomainModel;
+using SV18T1021246.Web.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,24 +18,43 @@ namespace SV18T1021246.Web.Controllers
         /// </summary>
         /// <returns></returns>
         // GET: Shipper
-        public ActionResult Index(int page = 1, string searchValue = "")
+        public ActionResult Index()
         {
-            int pageSize = 10;
+            PaginationSearchInput model = Session["SHIPPERS_SEARCH"] as PaginationSearchInput;
+            if (model == null)
+            {
+                model = new PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = 10,
+                    SearchValue = ""
+                };
+            }
+            return View(model);
+        }
+
+        public ActionResult Search(Models.PaginationSearchInput input)
+        {
             int rowCount = 0;
-            var data = CommonDataService.ListOfShippers(page, pageSize,
-                                                            searchValue,
-                                                            out rowCount);
+            var data = CommonDataService.ListOfShippers(input.Page,
+                                                       input.PageSize,
+                                                       input.SearchValue,
+                                                       out rowCount);
+
             Models.ShipperPaginationResultModel model = new Models.ShipperPaginationResultModel()
             {
-                Page = page,
-                PageSize = pageSize,
-                SearchValue = searchValue,
+                Page = input.Page,
+                PageSize = input.PageSize,
+                SearchValue = input.SearchValue,
                 RowCount = rowCount,
                 Data = data
             };
 
+            Session["SHIPPERS_SEARCH"] = input;
+
             return View(model);
         }
+
         /// <summary>
         /// Bổ sung kahsch hàng mới
         /// </summary>

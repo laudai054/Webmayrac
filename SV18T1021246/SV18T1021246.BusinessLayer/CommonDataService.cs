@@ -15,7 +15,6 @@ namespace SV18T1021246.BusinessLayer
     /// </summary>
     public static class CommonDataService
     {
-        private static readonly IProductDAL productDB;
         //private static readonly ICustomerDAL customerDB;
         private static readonly ICountryDAL countryDB;
         private static readonly ICommonDAL<Customer> customerDB;
@@ -40,7 +39,6 @@ namespace SV18T1021246.BusinessLayer
                     shipperDB = new DataLayer.SQLServer.ShipperDAL(connectionString);
                     employeeDB = new DataLayer.SQLServer.EmployeeDAL(connectionString);
                     countryDB = new DataLayer.SQLServer.CountryDAL(connectionString);
-                    productDB = new DataLayer.SQLServer.ProductDAL(connectionString);
                     break;
                 default:
                     //categoryDB = new DataLayer.FakeDB.CategoryDAL();
@@ -50,18 +48,7 @@ namespace SV18T1021246.BusinessLayer
 
         
 
-        public static List<Product> ListOfProducts(int page, int pageSize, string searchValue,
-                                                    int supplierID, int categoryID, out int rowCount)
-        {
-            if (pageSize < 0)
-                pageSize = 0;
-            rowCount = productDB.Count(searchValue);
-            return productDB.List(page, pageSize, searchValue, supplierID, categoryID).ToList();
-        }
-        public static Product GetProduct(int productID)
-        {
-            return productDB.Get(productID);
-        }
+        
 
         /// <summary>
         /// TÌm kiếm và lấy danh sách KH
